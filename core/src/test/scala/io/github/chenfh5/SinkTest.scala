@@ -14,12 +14,14 @@ import pl.allegro.tech.embeddedelasticsearch.{EmbeddedElastic, PopularProperties
 
 class SinkTest {
   private val LOG = LoggerFactory.getLogger(getClass)
+  private val es_http_port = 9200
 
   implicit val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
   private lazy val embeddedElastic = EmbeddedElastic.builder
-    .withInResourceLocation("elasticsearch-6.6.2.zip")
-    .withSetting(PopularProperties.HTTP_PORT, 9200)
+    //    .withElasticVersion("6.6.2")
+    .withInResourceLocation("elasticsearch-6.6.2.zip") // make sure the zip file exist in resources path, if not then use with version to download, and comment this line
+    .withSetting(PopularProperties.HTTP_PORT, es_http_port)
     .withSetting(PopularProperties.TRANSPORT_TCP_PORT, 9300)
     .withSetting(PopularProperties.CLUSTER_NAME, "es662")
     .withStartTimeout(2, TimeUnit.MINUTES)
@@ -29,7 +31,7 @@ class SinkTest {
   private lazy val config = {
     val props = new util.HashMap[String, String]()
     props.put(EsConnConfig.ES_HOST, "localhost")
-    props.put(EsConnConfig.ES_PORT, "9200")
+    props.put(EsConnConfig.ES_PORT, es_http_port.toString)
     props.put(EsConnConfig.ES_AUTH_USER, "chenfh5")
     props.put(EsConnConfig.ES_AUTH_PWD, "ji32k7au4a83")
     props
@@ -48,7 +50,7 @@ class SinkTest {
     LOG.info("this is the test   end={}", OwnUtils.getTimeNow())
   }
 
-  //  @Test(enabled = true)
+  @Test(enabled = false)
   def testStart(): Unit = {
     val task = new EsSinkTask()
     task.start(config)
